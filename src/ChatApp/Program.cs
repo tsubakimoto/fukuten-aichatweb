@@ -20,9 +20,13 @@ var openAIOptions = new OpenAIClientOptions()
     Endpoint = new Uri("https://models.inference.ai.azure.com")
 };
 
-var ghModelsClient = new OpenAIClient(credential, openAIOptions);
-var chatClient = ghModelsClient.GetChatClient("gpt-4o-mini").AsIChatClient();
-var embeddingGenerator = ghModelsClient.GetEmbeddingClient("text-embedding-3-small").AsIEmbeddingGenerator();
+//var ghModelsClient = new OpenAIClient(credential, openAIOptions);
+//var chatClient = ghModelsClient.GetChatClient("gpt-4o-mini").AsIChatClient();
+//var embeddingGenerator = ghModelsClient.GetEmbeddingClient("text-embedding-3-small").AsIEmbeddingGenerator();
+
+var openAiClientBuilder = builder.AddOpenAIClient("chat");
+openAiClientBuilder.AddChatClient("gpt-4o-mini").UseFunctionInvocation().UseLogging();
+openAiClientBuilder.AddEmbeddingGenerator("text-embedding-3-small");
 
 var vectorStorePath = Path.Combine(AppContext.BaseDirectory, "vector-store.db");
 var vectorStoreConnectionString = $"Data Source={vectorStorePath}";
@@ -32,8 +36,8 @@ builder.Services.AddSqliteCollection<string, IngestedChunk>(IngestedChunk.Collec
 builder.Services.AddSingleton<DataIngestor>();
 builder.Services.AddSingleton<SemanticSearch>();
 builder.Services.AddKeyedSingleton("ingestion_directory", new DirectoryInfo(Path.Combine(builder.Environment.WebRootPath, "Data")));
-builder.Services.AddChatClient(chatClient).UseFunctionInvocation().UseLogging();
-builder.Services.AddEmbeddingGenerator(embeddingGenerator);
+//builder.Services.AddChatClient(chatClient).UseFunctionInvocation().UseLogging();
+//builder.Services.AddEmbeddingGenerator(embeddingGenerator);
 
 var app = builder.Build();
 
