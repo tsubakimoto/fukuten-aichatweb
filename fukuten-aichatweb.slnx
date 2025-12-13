@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/ChatApp/ChatApp.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ChatApp.Test/ChatApp.Test.csproj" Id="b4c68208-4286-4c2a-9726-56fb33425c65" />
+  </Folder>
 </Solution>
