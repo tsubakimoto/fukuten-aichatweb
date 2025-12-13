@@ -22,4 +22,8 @@
     <InternalsVisibleTo Include="ChatApp.Test" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChatApp.ServiceDefaults\ChatApp.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>

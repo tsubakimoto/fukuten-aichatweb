@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/ChatApp.AppHost/ChatApp.AppHost.csproj" Id="ba24fdde-4dff-43eb-b5be-c2603e747718" />
+    <Project Path="src/ChatApp.ServiceDefaults/ChatApp.ServiceDefaults.csproj" />
     <Project Path="src/ChatApp/ChatApp.csproj" />
   </Folder>
   <Folder Name="/tests/">

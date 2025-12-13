@@ -1,4 +1,4 @@
-using System.ClientModel;
+﻿using System.ClientModel;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using ChatApp.Components;
@@ -6,6 +6,8 @@ using ChatApp.Services;
 using ChatApp.Services.Ingestion;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 // You will need to set the endpoint and key to your own values
@@ -34,6 +36,8 @@ builder.Services.AddChatClient(chatClient).UseFunctionInvocation().UseLogging();
 builder.Services.AddEmbeddingGenerator(embeddingGenerator);
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
