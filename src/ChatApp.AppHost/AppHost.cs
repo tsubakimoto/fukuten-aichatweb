@@ -6,7 +6,13 @@ var builder = DistributedApplication.CreateBuilder(args);
 var model = GitHubModel.OpenAI.OpenAIGpt4oMini;
 var chat = builder.AddGitHubModel("chat", model);
 
-builder.AddProject<Projects.ChatApp>("chatapp")
-       .WithReference(chat);
+var web = builder.AddProject<Projects.ChatApp>("chatapp")
+                 .WithReference(chat);
+
+// Dev tunnels
+//   https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started?tabs=windows
+var tunnel = builder.AddDevTunnel("my-tunnel")
+                    .WithReference(web)
+                    .WithAnonymousAccess();
 
 builder.Build().Run();
