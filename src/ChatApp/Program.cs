@@ -4,6 +4,7 @@ using OpenAI;
 using ChatApp.Components;
 using ChatApp.Services;
 using ChatApp.Services.Ingestion;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,22 @@ builder.Services.AddKeyedSingleton("ingestion_directory", new DirectoryInfo(Path
 //builder.Services.AddChatClient(chatClient).UseFunctionInvocation().UseLogging();
 //builder.Services.AddEmbeddingGenerator(embeddingGenerator);
 
+// Cosmos DB chat history persistence
+var cosmosConn = builder.Configuration.GetConnectionString("chats")
+    ?? throw new InvalidOperationException("Missing configuration: ConnectionStrings:chats");
+builder.Services.AddDbContext<ChatHistoryDbContext>(options => options.UseCosmos(cosmosConn, databaseName: "db"));
+builder.Services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+// Ensure Cosmos resources
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ChatHistoryDbContext>();
+    db.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

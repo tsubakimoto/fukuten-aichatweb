@@ -3,6 +3,7 @@
 @inject IChatClient ChatClient
 @inject NavigationManager Nav
 @inject SemanticSearch Search
+@inject ChatApp.Services.IChatHistoryRepository History
 @implements IDisposable
 
 <PageTitle>Chat</PageTitle>
@@ -12,8 +13,6 @@
 <ChatMessageList Messages="@messages" InProgressMessage="@currentResponseMessage">
     <NoMessagesContent>
         <div>To get started, try asking about these example documents. You can replace these with your own data and replace this message.</div>
-        @* <ChatCitation File="Example_Emergency_Survival_Kit.pdf"/> *@
-        @* <ChatCitation File="Example_GPS_Watch.md"/> *@
         <ChatCitation File="Azure-Quick-Start-for-NET-Developers.pdf"/>
         <ChatCitation File="Architecting-Modern-Web-Applications-with-ASP.NET-Core-and-Azure.pdf"/>
     </NoMessagesContent>
@@ -22,7 +21,7 @@
 <div class="chat-container">
     <ChatSuggestions OnSelected="@AddUserMessageAsync" @ref="@chatSuggestions" />
     <ChatInput OnSend="@AddUserMessageAsync" @ref="@chatInput" />
-    <SurveyPrompt /> @* Remove this line to eliminate the template survey message *@
+    <SurveyPrompt />
 </div>
 
 @code {
@@ -71,6 +70,17 @@
         chatSuggestions?.Clear();
         await chatInput!.FocusAsync();
 
+        // Persist user message
+        if (chatOptions.ConversationId is not null)
+        {
+            await History.SaveAsync(new ChatMessageEntity
+            {
+                ConversationId = chatOptions.ConversationId,
+                Role = ChatRole.User,
+                Text = userMessage.Text!
+            });
+        }
+
         // Stream and display a new response from the IChatClient
         var responseText = new TextContent("");
         currentResponseMessage = new ChatMessage(ChatRole.Assistant, [responseText]);
@@ -85,6 +95,15 @@
 
         // Store the final response in the conversation, and begin getting suggestions
         messages.Add(currentResponseMessage!);
+
+        // Persist assistant final message
+        await History.SaveAsync(new ChatMessageEntity
+        {
+            ConversationId = chatOptions.ConversationId ?? string.Empty,
+            Role = ChatRole.Assistant,
+            Text = currentResponseMessage!.Text!
+        });
+
         statefulMessageCount = chatOptions.ConversationId is not null ? messages.Count : 0;
         currentResponseMessage = null;
         chatSuggestions?.Update(messages);
