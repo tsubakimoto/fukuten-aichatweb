@@ -1,22 +1,25 @@
 ﻿using System.ClientModel;
 
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 
 using OpenAI;
 
-string key = Environment.GetEnvironmentVariable("CHAT_KEY")
-    ?? throw new InvalidOperationException("Missing configuration: CHAT_KEY.");
-string endpoint = Environment.GetEnvironmentVariable("CHAT_URI")
-    ?? throw new InvalidOperationException("Missing configuration: CHAT_URI.");
-string deployment = Environment.GetEnvironmentVariable("CHAT_MODEL")
-    ?? throw new InvalidOperationException("Missing configuration: CHAT_MODEL.");
+IConfigurationRoot config = new ConfigurationBuilder()
+    .Build();
 
-ApiKeyCredential credential = new(key);
+ChatConfig chatConfig = new(
+    config["CHAT_KEY"] ?? throw new InvalidOperationException("Missing configuration: CHAT_KEY."),
+    config["CHAT_URI"] ?? throw new InvalidOperationException("Missing configuration: CHAT_URI."),
+    config["CHAT_MODEL"] ?? throw new InvalidOperationException("Missing configuration: CHAT_MODEL.")
+);
+
+ApiKeyCredential credential = new(chatConfig.Key);
 OpenAIClientOptions openAIOptions = new()
 {
-    Endpoint = new Uri(endpoint)
+    Endpoint = new Uri(chatConfig.Uri)
 };
-IChatClient client = new OpenAIClient(credential, openAIOptions).GetChatClient(deployment).AsIChatClient();
+IChatClient client = new OpenAIClient(credential, openAIOptions).GetChatClient(chatConfig.Model).AsIChatClient();
 
 string prompt = "What is the capital of Japan?";
 string response = "";

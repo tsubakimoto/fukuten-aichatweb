@@ -11,6 +11,7 @@
     <PackageReference Include="Aspire.Azure.AI.Inference" Version="13.0.2-preview.1.25603.5" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.0.1-preview.1.25571.5" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="*" />
   </ItemGroup>
 
 </Project>
