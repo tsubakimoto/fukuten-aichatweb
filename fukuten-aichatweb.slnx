@@ -8,4 +8,5 @@
     <Project Path="tests/ChatApp.Test/ChatApp.Test.csproj" Id="b4c68208-4286-4c2a-9726-56fb33425c65" />
   </Folder>
   <Project Path="src/ChatConsole/ChatConsole.csproj" Id="35c27971-b3b4-4d43-8a2e-a9cc804db22f" />
+  <Project Path="tests/ChatConsole.Test/ChatConsole.Test.csproj" Id="f47a89fe-40ed-4224-966d-fddc2876a1bd" />
 </Solution>
