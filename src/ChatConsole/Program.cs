@@ -6,10 +6,13 @@ using OpenAI;
 
 string key = Environment.GetEnvironmentVariable("CHAT_KEY")
     ?? throw new InvalidOperationException("Missing configuration: CHAT_KEY.");
+string endpoint = Environment.GetEnvironmentVariable("CHAT_URI")
+    ?? throw new InvalidOperationException("Missing configuration: CHAT_URI.");
+
 ApiKeyCredential credential = new(key);
 OpenAIClientOptions openAIOptions = new OpenAIClientOptions()
 {
-    Endpoint = new Uri(Environment.GetEnvironmentVariable("CHAT_URI"))
+    Endpoint = new Uri(endpoint)
 };
 
 string deployment = Environment.GetEnvironmentVariable("CHAT_MODEL")
