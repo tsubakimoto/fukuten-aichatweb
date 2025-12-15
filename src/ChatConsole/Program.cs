@@ -12,7 +12,7 @@ string deployment = Environment.GetEnvironmentVariable("CHAT_MODEL")
     ?? throw new InvalidOperationException("Missing configuration: CHAT_MODEL.");
 
 ApiKeyCredential credential = new(key);
-OpenAIClientOptions openAIOptions = new OpenAIClientOptions()
+OpenAIClientOptions openAIOptions = new()
 {
     Endpoint = new Uri(endpoint)
 };
