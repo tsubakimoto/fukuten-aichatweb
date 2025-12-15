@@ -26,4 +26,8 @@ var tunnel = builder.AddDevTunnel("my-tunnel")
                     .WithReference(web)
                     .WithAnonymousAccess();
 
+// ChatConsole Project
+builder.AddProject<Projects.ChatConsole>("chatconsole")
+       .WithReference(chat);
+
 builder.Build().Run();
