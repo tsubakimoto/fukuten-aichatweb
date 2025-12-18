@@ -26,8 +26,12 @@ var tunnel = builder.AddDevTunnel("my-tunnel")
                     .WithReference(web)
                     .WithAnonymousAccess();
 
-// ChatConsole Project
-builder.AddProject<Projects.ChatConsole>("chatconsole")
+//// ChatConsole Project
+//builder.AddProject<Projects.ChatConsole>("chatconsole")
+//       .WithReference(chat);
+
+// ChatBlazor Project
+builder.AddProject<Projects.ChatBlazor>("chatblazor")
        .WithReference(chat);
 
 builder.Build().Run();
