@@ -17,21 +17,21 @@ var container = db.AddContainer("chats", "/id");
 
 // ChatApp Project
 var web = builder.AddProject<Projects.ChatApp>("chatapp")
-                 .WithReference(chat)
-                 .WithReference(container);
+                 .WithReference(chat).WaitFor(chat)
+                 .WithReference(container).WaitFor(container);
 
 // Dev tunnels
 //   https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started?tabs=windows
 var tunnel = builder.AddDevTunnel("my-tunnel")
-                    .WithReference(web)
+                    .WithReference(web).WaitFor(web)
                     .WithAnonymousAccess();
 
-//// ChatConsole Project
-//builder.AddProject<Projects.ChatConsole>("chatconsole")
-//       .WithReference(chat);
+// ChatConsole Project
+builder.AddProject<Projects.ChatConsole>("chatconsole")
+       .WithReference(chat).WaitFor(chat);
 
 // ChatBlazor Project
 builder.AddProject<Projects.ChatBlazor>("chatblazor")
-       .WithReference(chat);
+       .WithReference(chat).WaitFor(chat);
 
 builder.Build().Run();
