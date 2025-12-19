@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using OpenAI;
 
 IConfigurationRoot config = new ConfigurationBuilder()
+    //.AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
     .Build();
 
 ChatConfig chatConfig = new(
