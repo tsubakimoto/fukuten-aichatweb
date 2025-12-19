@@ -1,7 +1,106 @@
 ﻿@page "/"
+@using Microsoft.Extensions.AI
+@using System.Threading.Tasks
+@using System.ComponentModel.DataAnnotations
+@inject IChatClient ChatClient
+@inject ILogger<Home> Logger
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<EditForm Model="Model" OnValidSubmit="Submit" FormName="user-prompt-form" Enhance>
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<label>
+		質問:
+		<InputText @bind-Value="Model!.Question" />
+	</label>
+	<button type="submit">送信</button>
+</EditForm>
+
+<hr />
+
+@foreach (var message in messages)
+{
+	<p>
+		[@message.Role] @message.Text
+	</p>
+}
+
+@* @if (currentResponseMessage is not null)
+{
+	<p>
+		[@currentResponseMessage.Role] @currentResponseMessage.Text
+	</p>
+}*@
+
+@code {
+    private const string SystemPrompt = @"
+		あなたは福岡県の観光大使です。
+		福岡県の観光に関する質問に対して、親切かつ丁寧に答えてください。
+		";
+
+	[SupplyParameterFromForm]
+    private FormModel? Model { get; set; }
+
+    private int statefulMessageCount;
+    private readonly ChatOptions chatOptions = new();
+    private readonly List<ChatMessage> messages = new();
+    private CancellationTokenSource? currentResponseCancellation;
+    private ChatMessage? currentResponseMessage;
+
+    protected override void OnInitialized()
+    {
+        Model ??= new();
+		statefulMessageCount = 0;
+		messages.Add(new(ChatRole.System, SystemPrompt));
+        Logger.LogInformation("Chat initialized with system prompt.");
+    }
+
+    private async Task Submit()
+    {
+		CancelAnyCurrentResponse();
+
+		messages.Add(new(ChatRole.User, Model!.Question));
+		Model.Reset();
+
+        var responseText = new TextContent("");
+        currentResponseMessage = new ChatMessage(ChatRole.Assistant, [responseText]);
+        currentResponseCancellation = new();
+        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, currentResponseCancellation.Token))
+        {
+            messages.AddMessages(update, filter: c => c is not TextContent);
+            responseText.Text += update.Text;
+            chatOptions.ConversationId = update.ConversationId;
+			StateHasChanged();
+		}
+		messages.Add(currentResponseMessage!);
+
+        statefulMessageCount = chatOptions.ConversationId is not null ? messages.Count : 0;
+        currentResponseMessage = null;
+    }
+
+	private void CancelAnyCurrentResponse()
+	{
+		// If a response was cancelled while streaming, include it in the conversation so it's not lost
+		if (currentResponseMessage is not null)
+		{
+			messages.Add(currentResponseMessage);
+		}
+
+		currentResponseCancellation?.Cancel();
+		currentResponseMessage = null;
+	}
+
+    public class FormModel
+    {
+		[Required]
+		[StringLength(30)]
+		public string Question { get; set; } = string.Empty;
+
+        public void Reset() => Question = string.Empty;
+    }
+}
