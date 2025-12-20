@@ -1,6 +1,9 @@
 {
     "name": ".NET in Codespaces",
     "image": "mcr.microsoft.com/dotnet/sdk:10.0",
+    // "build": {
+    //     "dockerfile": "Dockerfile"
+    // },
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
         "ghcr.io/devcontainers/features/github-cli:1": {
@@ -17,7 +20,8 @@
             "version": "none",
             "dotnetRuntimeVersions": "10.0",
             "aspNetCoreRuntimeVersions": "10.0"
-        }
+        },
+        "ghcr.io/stuartleeks/dev-container-features/dev-tunnels:0": {}
     },
     "customizations": {
         "vscode": {
@@ -29,13 +33,7 @@
             ]
         }
     },
-    "forwardPorts": [
-        // 8080,
-        // 8081,
-        17030
-    ],
-    // "postCreateCommand": "dotnet new install Aspire.ProjectTemplates && cd ./SampleApp && dotnet restore",
-    "postCreateCommand": "dotnet tool install -g Aspire.Cli && dotnet build fukuten-aichatweb.slnx",
+    "postCreateCommand": "dotnet tool install -g Aspire.Cli && dotnet dev-certs https && dotnet build fukuten-aichatweb.slnx",
     "hostRequirements": {
         "memory": "8gb",
         "cpus": 4
@@ -43,19 +41,5 @@
     "remoteEnv": {
         "DOTNET_MULTILEVEL_LOOKUP": "0",
         "TARGET": "net10.0"
-    },
-    "portsAttributes": {
-        // "8080": {
-        //     "label": "Weather API",
-        //     "onAutoForward": "notify"
-        // },
-        // "8081": {
-        //     "label": "Weather Front End",
-        //     "onAutoForward": "notify"
-        // },
-        "17030": {
-            "label": "Aspire Dashboard",
-            "onAutoForward": "notify"
-        }
     }
 }
